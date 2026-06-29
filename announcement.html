@@ -1,0 +1,1938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ArchiveNet — Announcements — [RECOVERED THREAD]</title>
+<style>
+:root {
+  --bg: #0a0806;
+  --bg2: #110e0a;
+  --text: #c8b89a;
+  --text-dim: #6b5c47;
+  --text-faint: #3a3028;
+  --red: #8b1a1a;
+  --red2: #cc2200;
+  --red-bright: #ff3300;
+  --border: #2a2018;
+  --border2: #1a1410;
+  --link: #7a6a55;
+  --link-bright: #aa8855;
+  --header-bg: #0d0b08;
+  --nav-bg: #1a1410;
+  --gold: #7a6030;
+  --gold-bright: #aa8840;
+  --green-dim: #1a2a1a;
+  --green: #2a4a2a;
+  --mono: "Courier New", "Lucida Console", monospace;
+  --serif: "Times New Roman", Georgia, serif;
+  --sans: Arial, "Helvetica Neue", sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--serif);
+  font-size: 13px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── SCANLINE OVERLAY ── */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 9000;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0,0,0,0) 0px,
+    rgba(0,0,0,0) 2px,
+    rgba(0,0,0,0.18) 2px,
+    rgba(0,0,0,0.18) 3px
+  );
+  mix-blend-mode: multiply;
+}
+
+/* ── BLACK SCREEN INTRO ── */
+#introOverlay {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 0;
+  cursor: default;
+}
+
+.intro-line {
+  font-family: var(--mono);
+  font-size: 15px;
+  color: #fff;
+  opacity: 0;
+  text-align: center;
+  letter-spacing: 2px;
+  padding: 6px 20px;
+  transition: opacity 0.4s;
+  max-width: 520px;
+  line-height: 1.6;
+}
+
+.intro-line.red { color: #cc2200; }
+.intro-line.dim { color: #444; font-size: 11px; letter-spacing: 1px; }
+.intro-line.big { font-size: 20px; letter-spacing: 4px; }
+.intro-line.show { opacity: 1; }
+.intro-line.fade { opacity: 0; transition: opacity 1.2s; }
+
+#introCursor {
+  display: inline-block;
+  width: 10px;
+  height: 16px;
+  background: #fff;
+  margin-left: 4px;
+  vertical-align: middle;
+  animation: blink 0.9s step-end infinite;
+}
+
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+/* ── LOADING SCREEN ── */
+#loadingScreen {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 9999;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-family: var(--mono);
+}
+
+.loading-bar-wrap {
+  width: 320px;
+  height: 12px;
+  border: 1px solid var(--border);
+  background: #0d0a08;
+  position: relative;
+  overflow: hidden;
+}
+
+.loading-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3a2a1a, #6b4a2a);
+  width: 0%;
+  transition: width 0.12s linear;
+}
+
+.loading-text {
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.loading-sub {
+  font-size: 10px;
+  color: var(--text-faint);
+  letter-spacing: 1px;
+}
+
+/* ── SITE SHELL ── */
+#siteShell {
+  display: none;
+  opacity: 0;
+  transition: opacity 0.8s;
+}
+
+.site-header {
+  background: var(--header-bg);
+  border-bottom: 2px solid var(--gold);
+  padding: 8px 16px;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.site-header-title {
+  font-family: var(--sans);
+  font-size: 22px;
+  font-weight: bold;
+  color: #c8b070;
+  letter-spacing: 2px;
+}
+
+.site-header-tag {
+  font-size: 10px;
+  color: var(--text-faint);
+  font-family: var(--mono);
+  font-style: italic;
+}
+
+.breadcrumb {
+  background: var(--nav-bg);
+  border-bottom: 1px solid var(--border);
+  padding: 4px 16px;
+  font-family: var(--sans);
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.breadcrumb a { color: var(--link); text-decoration: none; }
+.breadcrumb a:hover { color: var(--link-bright); text-decoration: underline; }
+.breadcrumb span { color: var(--text-faint); margin: 0 4px; }
+
+/* ── MAIN LAYOUT ── */
+.main-layout {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 14px 12px;
+  display: flex;
+  gap: 14px;
+}
+
+.sidebar {
+  width: 170px;
+  flex-shrink: 0;
+}
+
+.content { flex: 1; min-width: 0; }
+
+/* ── BOXES ── */
+.box {
+  border: 1px solid var(--border);
+  background: var(--bg2);
+  margin-bottom: 12px;
+}
+
+.box-header {
+  background: var(--nav-bg);
+  border-bottom: 1px solid var(--border);
+  padding: 3px 8px;
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+}
+
+.box-header.red {
+  background: #1a0808;
+  border-bottom-color: var(--red);
+  color: var(--red2);
+}
+
+.box-header.gold {
+  background: #1a1208;
+  border-bottom-color: var(--gold);
+  color: var(--gold-bright);
+}
+
+.box-content { padding: 8px; }
+
+/* ── THREAD META BAR ── */
+.thread-meta-bar {
+  background: #0f0c08;
+  border: 1px solid var(--border);
+  border-bottom: 2px solid var(--red);
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.thread-meta-bar::before {
+  content: '⚠ RECOVERED ARCHIVE — PARTIAL INTEGRITY';
+  display: block;
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--red);
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+  opacity: 0.7;
+}
+
+.thread-title-main {
+  font-family: var(--sans);
+  font-size: 16px;
+  font-weight: bold;
+  color: #c8b070;
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+
+.thread-meta-row {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.thread-meta-row .locked {
+  color: var(--red);
+  font-weight: bold;
+}
+
+/* ── SYSTEM NOTICES ── */
+.sys-notice {
+  background: #0f0c08;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--text-faint);
+  padding: 5px 10px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-faint);
+  margin: 6px 0;
+  line-height: 1.7;
+}
+
+.sys-notice.warn {
+  border-left-color: var(--red);
+  color: #664433;
+}
+
+.sys-notice.red-box {
+  border-left-color: var(--red2);
+  background: #100808;
+  color: var(--red);
+}
+
+/* ── POSTS ── */
+.post {
+  border: 1px solid var(--border);
+  background: var(--bg2);
+  margin-bottom: 7px;
+  position: relative;
+}
+
+.post.op { border-color: #2a2010; }
+.post.mod { border-color: #1a0808; }
+.post.stranger { border-color: #1a0f08; }
+.post.deleted {
+  border-color: var(--text-faint);
+  opacity: 0.45;
+}
+.post.corrupted { border-color: #1a1510; }
+
+.post-header {
+  background: #0d0b08;
+  border-bottom: 1px solid var(--border);
+  padding: 4px 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.post.mod .post-header { background: #100808; border-bottom-color: #1a0a0a; }
+.post.stranger .post-header { background: #100d08; border-bottom-color: #1a1208; }
+
+.post-user {
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: bold;
+  color: var(--link-bright);
+}
+
+.post-user.op-name { color: #b8903a; }
+.post-user.mod-name { color: #8b1a1a; }
+.post-user.ghost { color: #3a3028; font-style: italic; }
+.post-user.stranger-name { color: #7a6a38; }
+
+.post-timestamp {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+
+.post-timestamp.corrupted { color: #1a1510; }
+
+.post-role {
+  font-size: 9px;
+  font-family: var(--mono);
+  padding: 1px 5px;
+  border: 1px solid var(--border);
+  color: var(--text-faint);
+}
+
+.post-role.mod { border-color: #3a0a0a; color: #6b1a1a; }
+
+.post-inner {
+  display: flex;
+  gap: 0;
+}
+
+.post-avatar {
+  width: 52px;
+  flex-shrink: 0;
+  background: #0d0b08;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 4px;
+  gap: 4px;
+}
+
+.avatar-icon {
+  width: 34px;
+  height: 34px;
+  background: #1a1610;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: bold;
+  color: var(--text-dim);
+  font-family: var(--mono);
+}
+
+.avatar-icon.op-av { background: #1a1408; border-color: var(--gold); color: var(--gold-bright); }
+.avatar-icon.mod-av { background: #1a0808; border-color: var(--red); color: var(--red2); }
+.avatar-icon.ghost-av { background: #0d0b08; border-color: #1a1510; color: #2a2018; }
+
+.avatar-posts {
+  font-size: 8px;
+  color: var(--text-faint);
+  font-family: var(--mono);
+  text-align: center;
+  line-height: 1.5;
+}
+
+.post-body {
+  padding: 10px 12px;
+  line-height: 1.75;
+  color: var(--text);
+  font-size: 13px;
+  flex: 1;
+  min-width: 0;
+  word-break: break-word;
+}
+
+.post.mod .post-body { color: #8b6055; }
+.post.deleted .post-body { color: var(--text-faint); font-style: italic; }
+.post.corrupted .post-body { color: #5a4a38; }
+
+.post-body p { margin-bottom: 8px; }
+.post-body p:last-child { margin-bottom: 0; }
+
+.post-body img {
+  max-width: 100%;
+  border: 1px solid var(--border);
+  display: block;
+  margin: 8px 0;
+}
+
+.img-wrap {
+  display: inline-block;
+  border: 1px solid var(--border);
+  background: #0a0806;
+  padding: 2px;
+  margin: 8px 0;
+  position: relative;
+}
+
+.img-wrap img {
+  max-width: 360px;
+  display: block;
+  border: none;
+  margin: 0;
+  filter: sepia(0.4) contrast(0.9) brightness(0.85);
+}
+
+.img-caption {
+  font-size: 9px;
+  font-family: var(--mono);
+  color: var(--text-faint);
+  text-align: center;
+  padding: 2px 4px;
+  border-top: 1px solid var(--border);
+}
+
+.img-scanlines {
+  position: absolute;
+  top: 2px; left: 2px; right: 2px; bottom: 18px;
+  background: repeating-linear-gradient(0deg,
+    rgba(0,0,0,0) 0px, rgba(0,0,0,0) 3px,
+    rgba(0,0,0,0.12) 3px, rgba(0,0,0,0.12) 4px
+  );
+  pointer-events: none;
+}
+
+.quote-block {
+  border-left: 2px solid var(--gold);
+  background: #0d0b08;
+  padding: 6px 10px;
+  margin: 6px 0;
+  color: var(--text-dim);
+  font-size: 12px;
+  font-style: italic;
+}
+
+.quote-block .quote-from {
+  font-size: 9px;
+  font-family: var(--mono);
+  color: var(--text-faint);
+  font-style: normal;
+  margin-bottom: 3px;
+}
+
+.update-tag {
+  display: inline-block;
+  background: #1a1208;
+  border: 1px solid var(--gold);
+  color: var(--gold-bright);
+  font-family: var(--mono);
+  font-size: 9px;
+  padding: 1px 6px;
+  margin-bottom: 6px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.update-tag.red {
+  background: #1a0808;
+  border-color: var(--red);
+  color: var(--red2);
+}
+
+.gone-tag {
+  display: inline-block;
+  background: #100808;
+  border: 1px solid #3a0a0a;
+  color: #6b1a1a;
+  font-family: var(--mono);
+  font-size: 9px;
+  padding: 2px 8px;
+  letter-spacing: 2px;
+}
+
+/* ── POST FOOTER ── */
+.post-footer {
+  border-top: 1px solid var(--border);
+  padding: 3px 8px;
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text-faint);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.post-footer .report { color: #3a2018; }
+
+/* ── REPLY COUNT SEPARATOR ── */
+.reply-sep {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text-faint);
+  text-align: center;
+  padding: 4px;
+  letter-spacing: 1px;
+  border-top: 1px dotted var(--border);
+  border-bottom: 1px dotted var(--border);
+  margin: 8px 0;
+}
+
+/* ── TIME GAP MARKERS ── */
+.time-gap {
+  text-align: center;
+  padding: 14px 0 6px;
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text-faint);
+  letter-spacing: 2px;
+  position: relative;
+}
+
+.time-gap::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; top: 50%;
+  border-top: 1px solid var(--border2);
+  z-index: 0;
+}
+
+.time-gap span {
+  position: relative;
+  z-index: 1;
+  background: var(--bg);
+  padding: 0 10px;
+}
+
+/* ── SIDEBAR SPECIFICS ── */
+.s-stat { font-size: 11px; color: var(--text-dim); margin-bottom: 3px; line-height: 1.5; }
+.s-stat strong { color: var(--text); }
+.s-link { font-size: 11px; color: var(--link); text-decoration: none; display: block; margin-bottom: 3px; line-height: 1.7; }
+.s-link:hover { color: var(--link-bright); }
+.s-warn { font-size: 10px; color: var(--red); line-height: 1.6; margin-top: 4px; }
+
+.visitor-ctr {
+  background: #000;
+  color: #2a7a2a;
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 3px;
+  padding: 3px 8px;
+  border: 1px solid #1a3a1a;
+  display: inline-block;
+  margin: 4px auto;
+}
+
+hr { border: none; border-top: 1px solid var(--border); margin: 7px 0; }
+
+/* ── GLITCH EFFECTS ── */
+@keyframes glitch-1 {
+  0%,100%{clip-path:none;transform:none}
+  7%{clip-path:polygon(0 25%,100% 25%,100% 45%,0 45%);transform:translate(-2px,0)}
+  14%{clip-path:none;transform:none}
+  21%{clip-path:polygon(0 60%,100% 60%,100% 72%,0 72%);transform:translate(2px,0)}
+  28%{clip-path:none}
+}
+
+@keyframes glitch-text {
+  0%,100%{opacity:1}
+  48%{opacity:0.07}
+  52%{opacity:1}
+  78%{opacity:0.12}
+  82%{opacity:1}
+}
+
+@keyframes flicker-in {
+  0%{opacity:0} 5%{opacity:0.8} 8%{opacity:0} 12%{opacity:1}
+  50%{opacity:0.9} 51%{opacity:0.3} 53%{opacity:1} 100%{opacity:1}
+}
+
+.glitch-el { animation: glitch-1 6s infinite; }
+.glitch-text-el { animation: glitch-text 4s infinite; }
+
+@keyframes crt-flicker {
+  0%,96%,100%{opacity:1}
+  97%{opacity:0.6}
+  98%{opacity:0.9}
+  99%{opacity:0.5}
+}
+
+body { animation: crt-flicker 8s step-end infinite; }
+
+/* ── FOOTER ── */
+.site-footer {
+  text-align: center;
+  padding: 16px;
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text-faint);
+  border-top: 1px solid var(--border2);
+  margin-top: 20px;
+  letter-spacing: 1px;
+}
+
+/* ── FINAL GLITCH OVERLAY ── */
+#glitchOverlay {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  z-index: 99998;
+  pointer-events: none;
+  opacity: 0;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 640px) {
+  .main-layout { flex-direction: column; }
+  .sidebar { width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<!-- GLITCH OVERLAY -->
+<div id="glitchOverlay"></div>
+
+<!-- ════════════ BLACK SCREEN INTRO ════════════ -->
+<div id="introOverlay">
+  <div class="intro-line dim" id="il0">ArchiveNet / Announcements</div>
+  <div class="intro-line" id="il1" style="margin-top:40px;"> </div>
+  <div class="intro-line big" id="il2"> </div>
+  <div class="intro-line red" id="il3"> </div>
+  <div class="intro-line" id="il4"> </div>
+  <div class="intro-line dim" id="il5"> </div>
+  <div class="intro-line" id="il6"> </div>
+  <div class="intro-line red" id="il7"> </div>
+  <div class="intro-line dim" id="il8" style="margin-top:40px;"> </div>
+</div>
+
+<!-- ════════════ LOADING SCREEN ════════════ -->
+<div id="loadingScreen" style="display:none; flex-direction:column; align-items:center; justify-content:center; position:fixed; inset:0; background:var(--bg); z-index:9999;">
+  <div class="loading-text" id="loadingLabel">RETRIEVING ARCHIVED THREAD...</div>
+  <div style="margin-top:10px; width:320px;">
+    <div class="loading-bar-wrap">
+      <div class="loading-bar-fill" id="loadingBarFill"></div>
+    </div>
+  </div>
+  <div class="loading-sub" id="loadingSub" style="margin-top:6px;">Connecting to archive server...</div>
+  <div class="loading-sub" id="loadingBytes" style="margin-top:2px; color:#1a1410;">0 bytes received</div>
+</div>
+
+<!-- ════════════ MAIN SITE ════════════ -->
+<div id="siteShell">
+
+  <div class="site-header">
+    <div class="site-header-title">ArchiveNet</div>
+    <div class="site-header-tag">Preserving internet history since 2003</div>
+    <div style="margin-left:auto; font-family:var(--mono); font-size:9px; color:var(--text-faint);">
+      [THREAD RECOVERED — INTEGRITY: 61%]
+    </div>
+  </div>
+
+  <div class="breadcrumb">
+    <a href="index.html">Home</a>
+    <span>»</span>
+    <a href="index.html#page-forum">Forum</a>
+    <span>»</span>
+    <a href="index.html#page-forum">Announcements</a>
+    <span>»</span>
+    <span style="color:var(--text-dim);">My family stayed at Hotel Mutiara Lama in Perak. Something was wrong.</span>
+  </div>
+
+  <div class="main-layout">
+
+    <!-- ── SIDEBAR ── -->
+    <div class="sidebar">
+
+      <div class="box">
+        <div class="box-header red">⚠ Thread Status</div>
+        <div class="box-content">
+          <div class="s-stat"><strong style="color:var(--red2);">LOCKED</strong> — Admin</div>
+          <div class="s-stat">Started: <strong>21 Sep 2006</strong></div>
+          <div class="s-stat">Last post: <strong style="color:var(--text-faint);">Unknown</strong></div>
+          <div class="s-stat">Replies: <strong>31</strong></div>
+          <div class="s-stat">Views: <strong>847</strong></div>
+          <hr>
+          <div class="s-warn">Original poster account — no longer found in member directory.</div>
+        </div>
+      </div>
+
+      <div class="box">
+        <div class="box-header">Forum Navigation</div>
+        <div class="box-content">
+          <a class="s-link" href="index.html">← Back to ArchiveNet</a>
+          <a class="s-link" href="index.html#page-forum">← Forum Index</a>
+          <a class="s-link" href="index.html#page-forum">← Announcements</a>
+          <hr>
+          <div class="s-stat" style="color:var(--text-faint); font-size:10px;">Related threads: <span style="color:#1a1510;">[deleted]</span></div>
+          <div class="s-stat" style="color:var(--text-faint); font-size:10px;">Similar posts: <span style="color:#1a1510;">[not found]</span></div>
+        </div>
+      </div>
+
+      <div class="box">
+        <div class="box-header">Online Now</div>
+        <div class="box-content">
+          <div class="s-stat"><span style="color:#2a6a2a;">●</span> webmaster99</div>
+          <div class="s-stat"><span style="color:#2a6a2a;">●</span> archive_alice</div>
+          <div class="s-stat"><span style="color:var(--text-faint);">○</span> 1 guest</div>
+          <hr>
+          <div class="s-stat" style="color:var(--text-faint); font-size:10px; font-family:var(--mono);">
+            <span id="guestLabel">viewing this thread</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="box">
+        <div class="box-header">Site Stats</div>
+        <div class="box-content" style="text-align:center;">
+          <div class="visitor-ctr" id="visCount">004912</div>
+          <div class="s-stat" style="text-align:center; margin-top:4px; font-size:10px;">since Jan 2003</div>
+          <hr>
+          <div class="s-stat">Members: <strong id="memberCount">533</strong></div>
+          <div class="s-stat">Posts: <strong>8,441</strong></div>
+          <div class="s-stat" style="color:var(--text-faint); font-size:10px;">threads deleted this month: <strong style="color:var(--red);">24</strong></div>
+        </div>
+      </div>
+
+      <div class="box">
+        <div class="box-header">Location Note</div>
+        <div class="box-content">
+          <div class="s-stat" style="font-size:10px; font-family:var(--mono); line-height:1.7; color:var(--text-dim);">
+            Hotel Mutiara Lama<br>
+            Kuala Kangsar, Perak<br>
+            Peninsular Malaysia<br>
+            <hr style="margin:5px 0;">
+            <span style="color:var(--text-faint);">Status: Closed<br>Year: Est. ~1960s<br>Last known use: 2001</span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /sidebar -->
+
+    <!-- ── CONTENT ── -->
+    <div class="content">
+
+      <!-- Thread title bar -->
+      <div class="thread-meta-bar">
+        <div class="thread-title-main glitch-el">My family stayed at Hotel Mutiara Lama in Perak once when I was 12. Something was wrong with that place.</div>
+        <div class="thread-meta-row">
+          <span>Posted by <strong style="color:#b8903a;">RizalAziz_87</strong></span>
+          <span>21 Sep 2006, 11:42 PM</span>
+          <span>Category: Announcements</span>
+          <span class="locked">🔒 THREAD LOCKED</span>
+        </div>
+      </div>
+
+      <div class="sys-notice warn">
+        RECOVERY NOTE — This thread was flagged for deletion on 14 Nov 2006. Deletion did not complete.
+        17 of 31 replies recovered. Remaining replies show data integrity errors or could not be located.
+        Some post timestamps are inconsistent with server logs. Original images partially recovered.
+      </div>
+
+      <!-- ═══════════════════════════════
+           POST 1 — OP, original story
+           ═══════════════════════════════ -->
+      <div class="post op">
+        <div class="post-header">
+          <span class="post-user op-name">RizalAziz_87</span>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <span class="post-role">Member</span>
+            <span class="post-timestamp">21 Sep 2006 — 11:42 PM</span>
+          </div>
+        </div>
+        <div class="post-inner">
+          <div class="post-avatar">
+            <div class="avatar-icon op-av">RA</div>
+            <div class="avatar-posts">Posts<br>14<br><br>Joined<br>Aug 06</div>
+          </div>
+          <div class="post-body">
+            <div class="update-tag">Original Post</div>
+            <p>I've been meaning to write this for a long time and I never did because I couldn't figure out how to explain it without sounding like I was making things up. I still can't, so I'm just going to say what happened.</p>
+
+            <p>When I was about 12, maybe 1999, my father had a work trip in Kuala Kangsar. We went with him because it was school holidays. My mum, my younger sister Hana, and me. We stayed three nights at a place called Hotel Mutiara Lama. Old colonial-style building, used to be a rest house from the British era I think. It was already not doing well, not many guests. The staff kept to themselves.</p>
+
+            <p>The first night was normal. A bit quiet, that particular kind of heavy silence that old buildings have. Our room was on the second floor, end of the corridor. Room 14.</p>
+
+            <div class="img-wrap">
+              <img src="core/Malaysia1.jpeg" alt="Hotel Mutiara Lama exterior" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+              <div style="display:none; padding:30px 10px; text-align:center; color:var(--text-faint); font-family:var(--mono); font-size:10px;">[IMAGE — Malaysia1.jpeg — hotel exterior, evening]</div>
+              <div class="img-scanlines"></div>
+              <div class="img-caption">IMG_001 — Hotel Mutiara Lama, Kuala Kangsar — September 1999 (approx)</div>
+            </div>
+
+            <p>The second night my sister woke up at around 2 or 3 in the morning. She was sitting up in bed and just looking at the corner of the room. Not crying, not saying anything. Just looking. When I asked her what she was doing she didn't answer. When I turned on the lamp she blinked and said she'd been dreaming. She was 9 at the time. She went back to sleep.</p>
+
+            <p>I couldn't sleep after that. I lay there for a while and then I started noticing the smell. Hard to describe. Like old paper and something else underneath it that I couldn't name. It came and went. I eventually fell asleep.</p>
+
+            <p>The third night was worse. My father came back to the room late, he'd been out with his colleagues. My mum and sister were already asleep. I was awake reading. My father looked pale when he came in. I asked if he was alright and he said yes, just tired. But he didn't sleep. I could hear him turning over until I fell asleep myself.</p>
+
+            <p>In the morning I overheard him telling my mother something quietly in the bathroom. I couldn't make out the words. When I asked about it at breakfast he said he'd just had a strange dream. He looked the same way Hana had looked the night before. Not quite there.</p>
+
+            <p>We checked out that morning. We were supposed to stay one more night. My father said he had to get back early for work. My mother didn't ask questions.</p>
+
+            <p>I never found out what he heard or saw. He died in 2003 and I never asked him directly. I don't know if I was afraid of the answer or afraid there wasn't one.</p>
+
+            <p>I found a reference to this hotel in one of the archived pages here which is why I'm posting. Has anyone else stayed there? Or know anything about the building's history?</p>
+          </div>
+        </div>
+        <div class="post-footer">
+          <span>Post #1 of 31</span>
+          <span class="report">report · quote</span>
+        </div>
+      </div>
+
+      <!-- REPLY BATCH 1 -->
+      <div class="reply-sep">— 5 replies — first replies —</div>
+
+      <!-- Reply 2 -->
+      <div class="post">
+        <div class="post-header">
+          <span class="post-user">NightOwl_Penang</span>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <span class="post-role">Member</span>
+            <span class="post-timestamp">22 Sep 2006 — 12:08 AM</span>
+          </div>
+        </div>
+        <div class="post-inner">
+          <div class="post-avatar">
+            <div class="avatar-icon">NP</div>
+            <div class="avatar-posts">Posts<br>203</div>
+          </div>
+          <div class="post-body">
+            <p>Never stayed there specifically but I know the type of building. A lot of those old British rest houses got converted into hotels in the 70s and 80s and many of them are shutting down now or already closed. What made you search for it on here specifically?</p>
+          </div>
+        </div>
+        <div class="post-footer"><span>Post #2</span><span class="report">report · quote</span></div>
+      </div>
+
+      <!-- Reply 3 — OP -->
+      <div class="post op">
+        <div class="post-header">
+          <span class="post-user op-name">RizalAziz_87</span>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <span class="post-role">Member</span>
+            <span class="post-timestamp">22 Sep 2006 — 12:31 AM</span>
+          </div>
+        </div>
+        <div class="post-inner">
+          <div class="post-avatar">
+            <div class="avatar-icon op-av">RA</div>
+            <div class="avatar-posts">Posts<br>15</div>
+          </div>
+          <div class="post-body">
+            <div class="quote-block">
+              <div class="quote-from">NightOwl_Penang wrote:</div>
+              What made you search for it on here specifically?
+            </div>
+            <p>Someone in the old web archive section of this site posted a scan of a travel brochure from Perak, late 1990s. The hotel was listed. When I saw the name I just stopped. I hadn't thought about that trip for years. Something about seeing it written down made it feel more real, I don't know how to explain that.</p>
+            <p>I'm not saying anything supernatural happened. I don't know what happened. I'm just asking if anyone knows the building.</p>
+          </div>
+        </div>
+        <div class="post-footer"><span>Post #3</span><span class="report">report · quote</span></div>
+      </div>
+
+      <!-- Reply 4 -->
+      <div class="post">
+        <div class="post-header">
+          <span class="post-user">klforum_guy</span>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <span class="post-role">Member</span>
+            <span class="post-timestamp">22 Sep 2006 — 01:14 AM</span>
+          </div>
+        </div>
+        <div class="post-inner">
+          <div class="post-avatar">
+            <div class="avatar-icon">KG</div>
+            <div class="avatar-posts">Posts<br>87</div>
+          </div>
+          <div class="post-body">
+            <p>Old colonial buildings in Malaysia have a lot of history attached to them, not all of it comfortable. I'm not surprised the atmosphere was heavy. But that doesn't necessarily mean anything more than that.</p>
+            <p>Your sister staring into a corner at night could easily just be kids doing weird things while half asleep. My nephew does it sometimes. Doesn't mean anything.</p>
+          </div>
+        </div>
+        <div class="post-footer"><span>Post #4</span><span class="report">report · quote</span></div>
+      </div>
+
+      <!-- Reply 5 -->
+      <div class="post">
+        <div class="post-header">
+          <span class="post-user">Wanida_KK</span>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <span class="post-role">Senior Member</span>
+            <span class="post-timestamp">22 Sep 2006 — 09:47 AM</span>
+          </div>
+        </div>
+        <div class="post-inner">
+          <div class="post-avatar">
+            <div class="avatar-icon" style="background:#1a1a10; border-color:#2a2a18; color:#7a7a50;">WK</div>
+            <div class="avatar-posts">Posts<br>612<br><br>Location<br>KK</div>
+          </div>
+          <div class="post-body">
+            <p>I'm from Kuala Kangsar. That building is still standing, or it was last time I drove past. It's been empty for a few years now. Nobody goes in.</p>
+            <p>Locally people just say the building is not good. They don't usually explain beyond that. If you ask around in KK you'll get the same non-answer from most people. The older ones might say more but usually won't.</p>
+            <p>What room did you say you were in?</p>
+          </div>
+        </div>
+        <div class="post-footer"><span>Post #5</span><span class="report">report · quote</span></div>
+      </div>
+
+      <!-- Reply 6 — OP -->
+      <div class="post op">
+        <div class="post-header">
+          <span class="post-user op-name">RizalAziz_87</span>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <span class="post-role">Member</span>
+            <span class="post-timestamp">22 Sep 2006 — 10:02 AM</span>
+          </div>
+        </div>
+        <div class="post-inner">
+          <div class="post-avatar">
+            <div class="avatar-icon op-av">RA</div>
+            <div class="avatar-posts">Posts<br>16</div>
+          </div>
+          <div class="post-body">
+            <div class="quote-block">
+              <div class="quote-from">Wanida_KK wrote:</div>
+              What room did you say you were in?
+            </div>
+            <p>Room 14. Second floor. End of the corridor on the right side when you come up the stairs.</p>
+            <p>Do you know something about it specifically?</p>
+          </div>
+        </div>
+        <div class="post-footer"><span>Post #6</span><span class="report">report · quote</span></div>
+      </div>
+
+      <div class="time-gap"><span>— 22 Sep 2006, 11:00 AM — 14 hours pass — —</span></div>
+
+      <!-- Reply 7 — Wanida replies -->
+      <div class="post">
+        <div class="post-header">
+          <span class="post-user">Wanida_KK</span>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <span class="post-role">Senior Member</span>
+            <span class="post-timestamp">23 Sep 2006 — 12:49 AM</span>
+          </div>
+        </div>
+        <div class="post-inner">
+          <div class="post-avatar">
+            <div class="avatar-icon" style="background:#1a1a10; border-color:#2a2a18; color:#7a7a50;">WK</div>
+            <div class="avatar-posts">Posts<br>613</div>
+          </div>
+          <div class="post-body">
+            <p>Sorry for the delay. I asked my aunt.</p>
+            <p>She said room 14 had a different number before they renovated in the 80s. She doesn't remember what the number was. She also said she wouldn't go into the end of that corridor but she wouldn't say why exactly. She got a bit quiet and changed the subject. She's in her 70s and doesn't really talk about these things.</p>
+            <p>I don't want to speculate about what that means. Maybe nothing.</p>
+          </div>
+        </div>
+        <div class="post-footer"><span>Post #7</span><span class="report">report · quote</span></div>
+      </div>
+
+      <!-- Reply 8 — OP -->
+      <div class="post op">
+        <div class="post-header">
+          <span class="post-user op-name">RizalAziz_87</span>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <span class="post-role">Member</span>
+            <span class="post-timestamp">23 Sep 2006 — 01:03 AM</span>
+          </div>
+        </div>
+        <div class="post-inner">
+          <div class="post-avatar">
+            <div class="avatar-icon op-av">RA</div>
+            <div class="avatar-posts">Posts<br>17</div>
+          </div>
+          <div class="post-body">
+            <p>Thank you for asking her. Please tell her I'm not trying to dig up anything distressing.</p>
+            <p>I've been trying to find the hotel in old records. It was apparently built sometime in the 1920s as a government rest house. I found a reference in a colonial administration log that one of the archived pages here links to. I can't find any other mentions. The 1980s renovation you mentioned — do you know who owned it at that point?</p>
+            <p>Also — I went back through old family photos from that trip. I found two. I'm going to try to scan them and post them here.</p>
+          </div>
+        </div>
+        <div class="post-footer"><span>Post #8</span><span class="report">report · quote</span></div>
+      </div>
+
+      <!-- Reply 9 — new user -->
+      <div class="post">
+        <div class="post-header">
+          <span class="post-user">SambanPelan</span>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <span class="post-role">New Member</span>
+            <span class="post-timestamp">23 Sep 2006 — 06:22 AM</span>
+          </div>
+        </div>
+        <div class="post-inner">
+          <div class="post-avatar">
+            <div class="avatar-icon" style="border-color:#1a1815; color:#4a4030;">SP</div>
+            <div class="avatar-posts">Posts<br>2</div>
+          </div>
+          <div class="post-body">
+            <p>I found this thread through a search. I don't usually post but I want to say my uncle was a maintenance worker at that hotel, late 1980s into the 1990s, until the family said he was no longer allowed to work there. He had what they called a bad experience. He never described it in any specific way, just said that something in one of the rooms on the second floor spoke to him. Not in a voice. He said it was more like the room already knew who he was.</p>
+            <p>He is fine now. He has not talked about it since. I don't think he would want me to post his name here and I'm not going to.</p>
+          </div>
+        </div>
+        <div class="post-footer"><span>Post #9</span><span class="report">report · quote</span></div>
+      </div>
+
+      <!-- Reply 10 — skeptic -->
+      <div class="post">
+        <div class="post-header">
+          <span class="post-user">digital_archivist_kl</span>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <span class="post-role">Member</span>
+            <span class="post-timestamp">23 Sep 2006 — 10:11 AM</span>
+          </div>
+        </div>
+        <div class="post-inner">
+          <div class="post-avatar">
+            <div class="avatar-icon">DA</div>
+            <div class="avatar-posts">Posts<br>441</div>
+          </div>
+          <div class="post-body">
+            <p>I want to gently push back here. Old buildings have strange atmospheres. People who are tired, stressed, or sleeping in unfamiliar places have strange experiences. Your father came in late from what was probably an uncomfortable business evening and looked pale. People look pale when they're tired. Your sister stared into a corner — children do this, especially in light sleep.</p>
+            <p>The "room knew who I was" story from the maintenance worker is exactly what you'd expect when stories get passed around and get more dramatic. No offense to anyone here, I'm just saying we should be careful about confirming each other's feelings when there might be mundane explanations.</p>
+          </div>
+        </div>
+        <div class="post-footer"><span>Post #10</span><span class="report">report · quote</span></div>
+      </div>
+
+      <!-- Reply 11 — OP -->
+      <div class="post op">
+        <div class="post-header">
+          <span class="post-user op-name">RizalAziz_87</span>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <span class="post-role">Member</span>
+            <span class="post-timestamp">23 Sep 2006 — 11:28 AM</span>
+          </div>
+        </div>
+        <div class="post-inner">
+          <div class="post-avatar">
+            <div class="avatar-icon op-av">RA</div>
+            <div class="avatar-posts">Posts<br>18</div>
+          </div>
+          <div class="post-body">
+            <div class="quote-block">
+              <div class="quote-from">digital_archivist_kl wrote:</div>
+              we should be careful about confirming each other's feelings when there might be mundane explanations
+            </div>
+            <p>You're not wrong. I've thought about all of those explanations myself. I'm not asking anyone to believe anything. I'm asking if anyone knows the building's history.</p>
+            <p>Managed to scan the photos. Posting below. The quality isn't great, the originals are old and the scanner we have isn't good.</p>
+
+            <div class="img-wrap">
+              <img src="core/Malaysia2.jpeg" alt="Inside room 14, Hotel Mutiara Lama" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+              <div style="display:none; padding:30px 10px; text-align:center; color:var(--text-faint); font-family:var(--mono); font-size:10px;">[IMAGE — Malaysia2.jpeg — interior, room 14]</div>
+              <div class="img-scanlines"></div>
+              <div class="img-caption">IMG_002 — Room 14, Hotel Mutiara Lama — photograph taken by my father, Sep 1999</div>
+            </div>
+
+            <p>That's the corner of the room my sister was looking at. I didn't put that together until I found the photo just now. I'd forgotten which corner it was.</p>
+          </div>
+        </div>
+        <div class="post-footer"><span>Post #11</span><span class="report">report · quote</span></div>
+      </div>
+
+      <div class="time-gap"><span>— 23 Sep 2006 — 2 days pass — —</span></div>
+
+      <!-- Replies 12–14 — growing interest -->
+      <div class="post">
+        <div class="post-header">
+          <span class="post-user">NightOwl_Penang</span>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <span class="post-role">Member</span>
+            <span class="post-timestamp">25 Sep 2006 — 11:55 PM</span>
+          </div>
+        </div>
+        <div class="post-inner">
+          <div class="post-avatar">
+            <div class="avatar-icon">NP</div>
+            <div class="avatar-posts">Posts<br>205</div>
+          </div>
+          <div class="post-body">
+            <p>I keep coming back to this thread. Something about the photo is bothering me and I can't put my finger on what it is. I think it's the light. The light in that corner looks slightly different from the rest of the room. Probably just the age of the photo and how it scanned but it's stuck in my head.</p>
+            <p>Have you spoken to your sister about this since you were kids?</p>
+          </div>
+        </div>
+        <div class="post-footer"><span>Post #12</span><span class="report">report · quote</span></div>
+      </div>
+
+      <!-- Reply 13 — OP, shorter -->
+      <div class="post op">
+        <div class="post-header">
+          <span class="post-user op-name">RizalAziz_87</span>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <span class="post-role">Member</span>
+            <span class="post-timestamp">26 Sep 2006 — 12:18 AM</span>
+          </div>
+        </div>
+        <div class="post-inner">
+          <div class="post-avatar">
+            <div class="avatar-icon op-av">RA</div>
+            <div class="avatar-posts">Posts<br>19</div>
+          </div>
+          <div class="post-body">
+            <p>I called Hana tonight. She doesn't remember it, or at least she says she doesn't. She got quiet on the phone when I mentioned the hotel name. She asked how I'd found out about the trip because she'd apparently forgotten it completely. When I described the room she said she had a sudden headache and wanted to get off the phone.</p>
+            <p>She called back an hour later to tell me she'd been thinking about it and she remembered sitting up in bed and feeling like there was someone standing in the corner who she was not supposed to look at directly. She doesn't know why she remembered it as a dream.</p>
+            <p>She's not a superstitious person. She's an accountant.</p>
+          </div>
+        </div>
+        <div class="post-footer"><span>Post #13</span><span class="report">report · quote</span></div>
+      </div>
+
+      <!-- Reply 14 -->
+      <div class="post">
+        <div class="post-header">
+          <span class="post-user">HelangMalam</span>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <span class="post-role">Member</span>
+            <span class="post-timestamp">26 Sep 2006 — 01:09 AM</span>
+          </div>
+        </div>
+        <div class="post-inner">
+          <div class="post-avatar">
+            <div class="avatar-icon" style="background:#0f1008; border-color:#1a1a10; color:#5a5a30;">HM</div>
+            <div class="avatar-posts">Posts<br>57</div>
+          </div>
+          <div class="post-body">
+            <p>Not supposed to look at directly. That's a specific detail. That's the kind of detail that doesn't usually get invented.</p>
+          </div>
+        </div>
+        <div class="post-footer"><span>Post #14</span><span class="report">report · quote</span></div>
+      </div>
+
+      <div class="sys-notice">
+        [ 5 replies unrecovered — posts #15 through #19 — data integrity failure ]
+      </div>
+
+      <div class="time-gap"><span>— 5 days pass — 30 Sep 2006 — —</span></div>
+
+      <!-- Reply 20 — OP, longer, unsettled -->
+      <div class="post op">
+        <div class="post-header">
+          <span class="post-user op-name">RizalAziz_87</span>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <span class="post-role">Member</span>
+            <span class="post-timestamp">30 Sep 2006 — 02:44 AM</span>
+          </div>
+        </div>
+        <div class="post-inner">
+          <div class="post-avatar">
+            <div class="avatar-icon op-av">RA</div>
+            <div class="avatar-posts">Posts<br>20</div>
+          </div>
+          <div class="post-body">
+            <div class="update-tag">UPDATE</div>
+            <p>I wasn't going to post this but I don't have anyone else to tell it to and writing it down feels like it matters somehow.</p>
+            <p>I went back. I drove up to Kuala Kangsar this past weekend. I don't know what I was expecting to find.</p>
+            <p>The hotel is empty. The gate is padlocked. The sign is still there but faded, the gold lettering gone brown. The building looked exactly the way I remembered it except older and more tired. I stood at the gate for maybe half an hour. I didn't go in.</p>
+            <p>What I can say is this: while I was standing there I heard a sound from inside. Through the padlocked gate, through the overgrown garden, from somewhere in the building. It was a sound I recognized. I don't know from where exactly. Like a door opening slowly on a hinge that hasn't been oiled. Except no door moved that I could see.</p>
+            <p>And then from one of the upper windows — second floor, the end of the building — I saw a light. Not bright. More like a lamp being carried past. It lasted maybe three seconds and then it was gone.</p>
+            <p>The building is empty. I know it's empty. The padlock was rusted. There was no car anywhere nearby.</p>
+            <p>I left. I drove back to KL and I didn't stop. I got home at 4 AM.</p>
+            <p>I don't know what to do with this.</p>
+          </div>
+        </div>
+        <div class="post-footer"><span>Post #20</span><span class="report">report · quote</span></div>
+      </div>
+
+      <!-- Replies 21–24 — people responding to the update -->
+      <div class="post">
+        <div class="post-header">
+          <span class="post-user">Wanida_KK</span>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <span class="post-role">Senior Member</span>
+            <span class="post-timestamp">30 Sep 2006 — 09:15 AM</span>
+          </div>
+        </div>
+        <div class="post-inner">
+          <div class="post-avatar">
+            <div class="avatar-icon" style="background:#1a1a10; border-color:#2a2a18; color:#7a7a50;">WK</div>
+            <div class="avatar-posts">Posts<br>614</div>
+          </div>
+          <div class="post-body">
+            <p>Please don't go back. I mean this seriously. I showed this thread to my aunt and she told me that after the hotel closed, two or three times over the years, people went in. Not many. They don't talk about what they saw in any detail. They just say they don't go back.</p>
+            <p>My aunt called what is in that building by a specific name in Malay. I'm not going to write the name here. She said writing the name gives it attention and it doesn't need more attention.</p>
+          </div>
+        </div>
+        <div class="post-footer"><span>Post #21</span><span class="report">report · quote</span></div>
+      </div>
+
+      <div class="post">
+        <div class="post-header">
+          <span class="post-user">klforum_guy</span>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <span class="post-role">Member</span>
+            <span class="post-timestamp">30 Sep 2006 — 10:33 AM</span>
+          </div>
+        </div>
+        <div class="post-inner">
+          <div class="post-avatar">
+            <div class="avatar-icon">KG</div>
+            <div class="avatar-posts">Posts<br>90</div>
+          </div>
+          <div class="post-body">
+            <p>I'm going to stop being the skeptic in this thread. Not because I've changed my mind about the explanations. Just because it's not the point anymore. The point is that you're clearly disturbed by this and going back alone in the middle of the night to a padlocked abandoned building is not a safe thing to do.</p>
+            <p>Are you okay?</p>
+          </div>
+        </div>
+        <div class="post-footer"><span>Post #22</span><span class="report">report · quote</span></div>
+      </div>
+
+      <!-- Reply 23 — OP -->
+      <div class="post op">
+        <div class="post-header">
+          <span class="post-user op-name">RizalAziz_87</span>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <span class="post-role">Member</span>
+            <span class="post-timestamp">30 Sep 2006 — 11:50 AM</span>
+          </div>
+        </div>
+        <div class="post-inner">
+          <div class="post-avatar">
+            <div class="avatar-icon op-av">RA</div>
+            <div class="avatar-posts">Posts<br>21</div>
+          </div>
+          <div class="post-body">
+            <div class="quote-block">
+              <div class="quote-from">klforum_guy wrote:</div>
+              Are you okay?
+            </div>
+            <p>I think so. I slept badly but I think so.</p>
+            <p>I keep thinking about what my father's face looked like that morning. Not scared exactly. More like someone who had been told something they couldn't unhear.</p>
+            <p>I want to know what he saw. I think that's the real reason I went. Not to investigate anything. To understand something about my father that he didn't tell me before he died.</p>
+            <p>I don't know if that's a good enough reason to keep going.</p>
+          </div>
+        </div>
+        <div class="post-footer"><span>Post #23</span><span class="report">report · quote</span></div>
+      </div>
+
+      <!-- Reply 24 -->
+      <div class="post">
+        <div class="post-header">
+          <span class="post-user">HelangMalam</span>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <span class="post-role">Member</span>
+            <span class="post-timestamp">30 Sep 2006 — 01:22 PM</span>
+          </div>
+        </div>
+        <div class="post-inner">
+          <div class="post-avatar">
+            <div class="avatar-icon" style="background:#0f1008; border-color:#1a1a10; color:#5a5a30;">HM</div>
+            <div class="avatar-posts">Posts<br>58</div>
+          </div>
+          <div class="post-body">
+            <p>It's a good enough reason to want to know. It's not a good enough reason to go back alone.</p>
+          </div>
+        </div>
+        <div class="post-footer"><span>Post #24</span><span class="report">report · quote</span></div>
+      </div>
+
+      <div class="time-gap"><span>— 10 days pass — 10 Oct 2006 — —</span></div>
+
+      <!-- Reply 25 — OP, shorter and quieter -->
+      <div class="post op">
+        <div class="post-header">
+          <span class="post-user op-name">RizalAziz_87</span>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <span class="post-role">Member</span>
+            <span class="post-timestamp">10 Oct 2006 — 03:11 AM</span>
+          </div>
+        </div>
+        <div class="post-inner">
+          <div class="post-avatar">
+            <div class="avatar-icon op-av">RA</div>
+            <div class="avatar-posts">Posts<br>22</div>
+          </div>
+          <div class="post-body">
+            <div class="update-tag">UPDATE</div>
+            <p>I keep dreaming about the corridor.</p>
+            <p>Not the room. The corridor. Walking toward room 14 from the staircase. It's always the same and it always takes longer than it should. The corridor is longer in the dream than it would be in the building. I know this while I'm dreaming it. I'm walking and walking and the door at the end doesn't get closer for a long time and then suddenly I'm standing in front of it and I didn't see the distance close.</p>
+            <p>I didn't go back. I'm not planning to go back. I just wanted to write that down somewhere.</p>
+          </div>
+        </div>
+        <div class="post-footer"><span>Post #25</span><span class="report">report · quote</span></div>
+      </div>
+
+      <!-- Replies 26–28 — people asking, noticing OP is quieter -->
+      <div class="post">
+        <div class="post-header">
+          <span class="post-user">NightOwl_Penang</span>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <span class="post-role">Member</span>
+            <span class="post-timestamp">10 Oct 2006 — 10:02 AM</span>
+          </div>
+        </div>
+        <div class="post-inner">
+          <div class="post-avatar">
+            <div class="avatar-icon">NP</div>
+            <div class="avatar-posts">Posts<br>208</div>
+          </div>
+          <div class="post-body">
+            <p>Dreams about corridors that stretch longer than they should are a known thing. There's a term for it, I think, to do with how spatial memory works under stress. Your brain clearly hasn't let this go. Not surprising given everything.</p>
+            <p>How are you sleeping otherwise?</p>
+          </div>
+        </div>
+        <div class="post-footer"><span>Post #26</span><span class="report">report · quote</span></div>
+      </div>
+
+      <div class="post">
+        <div class="post-header">
+          <span class="post-user">SambanPelan</span>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <span class="post-role">New Member</span>
+            <span class="post-timestamp">11 Oct 2006 — 12:41 AM</span>
+          </div>
+        </div>
+        <div class="post-inner">
+          <div class="post-avatar">
+            <div class="avatar-icon" style="border-color:#1a1815; color:#4a4030;">SP</div>
+            <div class="avatar-posts">Posts<br>3</div>
+          </div>
+          <div class="post-body">
+            <p>I mentioned this thread to my uncle. He said I should tell you to stop trying to remember it so clearly. He was specific about that. He said the more clearly you try to hold onto what you remember from inside that building, the more it has to work with. He said this without me explaining what you had described and I hadn't mentioned room 14 or the corridor.</p>
+            <p>He asked if you were posting late at night. I told him yes. He said that figures.</p>
+          </div>
+        </div>
+        <div class="post-footer"><span>Post #27</span><span class="report">report · quote</span></div>
+      </div>
+
+      <!-- Reply 28 — OP, very short -->
+      <div class="post op">
+        <div class="post-header">
+          <span class="post-user op-name">RizalAziz_87</span>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <span class="post-role">Member</span>
+            <span class="post-timestamp">11 Oct 2006 — 01:09 AM</span>
+          </div>
+        </div>
+        <div class="post-inner">
+          <div class="post-avatar">
+            <div class="avatar-icon op-av">RA</div>
+            <div class="avatar-posts">Posts<br>23</div>
+          </div>
+          <div class="post-body">
+            <div class="quote-block">
+              <div class="quote-from">SambanPelan wrote:</div>
+              He asked if you were posting late at night.
+            </div>
+            <p>Tell him yes. Tell him I'm sorry.</p>
+            <p>I'm going to try to sleep.</p>
+          </div>
+        </div>
+        <div class="post-footer"><span>Post #28</span><span class="report">report · quote</span></div>
+      </div>
+
+      <div class="time-gap"><span>— 18 days pass — 29 Oct 2006 — —</span></div>
+
+      <div class="sys-notice warn">
+        [ 2 replies unrecovered — posts #29 and #30 ]
+      </div>
+
+      <!-- Reply 31 — OP, final message, clipped -->
+      <div class="post op">
+        <div class="post-header">
+          <span class="post-user op-name">RizalAziz_87</span>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <span class="post-role">Member</span>
+            <span class="post-timestamp">29 Oct 2006 — 04:17 AM</span>
+          </div>
+        </div>
+        <div class="post-inner">
+          <div class="post-avatar">
+            <div class="avatar-icon op-av">RA</div>
+            <div class="avatar-posts">Posts<br>24</div>
+          </div>
+          <div class="post-body">
+            <div class="update-tag red">Final Update</div>
+            <p>I went back inside. I need to write that down before I forget how I feel about it right now.</p>
+            <p>I got in through a side entrance, a window on the ground floor that had rotted through. I had a torch. The ground floor was empty, furniture moved to the walls, mould on the ceiling, smell of stagnant water. Normal for an abandoned building.</p>
+            <p>I went up the stairs. The stairs were solid, didn't move.</p>
+            <p>The corridor was not longer than it should have been. That's important to say. It was a normal corridor, maybe fifteen meters, maybe less. Doors on both sides. Room 14 at the end on the right.</p>
+            <p>The door to room 14 was already open.</p>
+            <p>I went in. The room was empty except for an old bedframe. No mattress. The wallpaper was peeling. The corner where my sister was looking — there was nothing there. Just a corner of a room that had been empty for years.</p>
+            <p>I stood in there for a while. Nothing happened. I was about to leave.</p>
+            <p>And then I understood what my father's face had looked like that morning.</p>
+            <p>It wasn't fear. It wasn't shock. It was the face of someone who had been asked a question they couldn't answer. Like being told something about yourself you had no way to verify but couldn't dismiss.</p>
+            <p>I understood because</p>
+          </div>
+        </div>
+        <div class="post-footer"><span>Post #31 of 31 — FINAL RECOVERED POST</span><span class="report">report · quote</span></div>
+      </div>
+
+      <!-- Post cuts off -->
+      <div class="sys-notice red-box">
+        POST #31 — TRANSMISSION INTERRUPTED — 29 Oct 2006, 04:17 AM<br>
+        Post was submitted incomplete. Server logged a connection drop at 04:17:44.<br>
+        No further posts by this user were made after this timestamp.<br>
+        Account is still marked ACTIVE in the member database.
+      </div>
+
+      <div class="time-gap"><span>— days pass — weeks pass — —</span></div>
+
+      <!-- LATER REPLIES — people asking where OP went -->
+
+      <div class="post stranger">
+        <div class="post-header">
+          <span class="post-user stranger-name">NightOwl_Penang</span>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <span class="post-role">Member</span>
+            <span class="post-timestamp">05 Nov 2006 — 11:44 PM</span>
+          </div>
+        </div>
+        <div class="post-inner">
+          <div class="post-avatar">
+            <div class="avatar-icon">NP</div>
+            <div class="avatar-posts">Posts<br>214</div>
+          </div>
+          <div class="post-body">
+            <p>RizalAziz_87, are you okay? Your last post cut off. Please reply when you can.</p>
+          </div>
+        </div>
+        <div class="post-footer"><span>Post #32</span><span class="report">report · quote</span></div>
+      </div>
+
+      <div class="post stranger">
+        <div class="post-header">
+          <span class="post-user stranger-name">Wanida_KK</span>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <span class="post-role">Senior Member</span>
+            <span class="post-timestamp">07 Nov 2006 — 09:00 AM</span>
+          </div>
+        </div>
+        <div class="post-inner">
+          <div class="post-avatar">
+            <div class="avatar-icon" style="background:#1a1a10; border-color:#2a2a18; color:#7a7a50;">WK</div>
+            <div class="avatar-posts">Posts<br>618</div>
+          </div>
+          <div class="post-body">
+            <p>I went past the hotel yesterday. The ground-floor window on the east side has been broken from the inside. Recent, from the look of it. The padlock on the gate is still there.</p>
+            <p>Rizal if you are reading this please say something.</p>
+          </div>
+        </div>
+        <div class="post-footer"><span>Post #33</span><span class="report">report · quote</span></div>
+      </div>
+
+      <div class="post stranger">
+        <div class="post-header">
+          <span class="post-user stranger-name">klforum_guy</span>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <span class="post-role">Member</span>
+            <span class="post-timestamp">09 Nov 2006 — 12:30 PM</span>
+          </div>
+        </div>
+        <div class="post-inner">
+          <div class="post-avatar">
+            <div class="avatar-icon">KG</div>
+            <div class="avatar-posts">Posts<br>93</div>
+          </div>
+          <div class="post-body">
+            <p>Does anyone actually know this person in real life? Has anyone contacted the admin about this? Something isn't right.</p>
+          </div>
+        </div>
+        <div class="post-footer"><span>Post #34</span><span class="report">report · quote</span></div>
+      </div>
+
+      <div class="post stranger">
+        <div class="post-header">
+          <span class="post-user stranger-name">HelangMalam</span>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <span class="post-role">Member</span>
+            <span class="post-timestamp">11 Nov 2006 — 02:07 AM</span>
+          </div>
+        </div>
+        <div class="post-inner">
+          <div class="post-avatar">
+            <div class="avatar-icon" style="background:#0f1008; border-color:#1a1a10; color:#5a5a30;">HM</div>
+            <div class="avatar-posts">Posts<br>60</div>
+          </div>
+          <div class="post-body">
+            <p>I understood because.</p>
+            <p>I keep reading that last line. He was going to tell us something specific. Something he understood in that room. And the post just ends.</p>
+            <p>I hope he's okay. I hope there's a boring explanation.</p>
+          </div>
+        </div>
+        <div class="post-footer"><span>Post #35</span><span class="report">report · quote</span></div>
+      </div>
+
+      <div class="time-gap"><span>— 3 weeks pass — —</span></div>
+
+      <!-- Mod locks it -->
+      <div class="post mod">
+        <div class="post-header">
+          <span class="post-user mod-name">[ Admin ]</span>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <span class="post-role mod">Administrator</span>
+            <span class="post-timestamp">02 Dec 2006 — 06:00 AM</span>
+          </div>
+        </div>
+        <div class="post-inner">
+          <div class="post-avatar">
+            <div class="avatar-icon mod-av">AD</div>
+            <div class="avatar-posts">Posts<br>—</div>
+          </div>
+          <div class="post-body">
+            <p>Thread is being locked pending review of the original poster's account status.</p>
+            <p>If you know RizalAziz_87 personally, please contact administration privately. Do not post personal information in this thread.</p>
+            <p>We ask that members do not continue to speculate in this thread.</p>
+            <p>— Administration</p>
+          </div>
+        </div>
+        <div class="post-footer"><span>Admin action</span><span class="report">—</span></div>
+      </div>
+
+      <div class="sys-notice">
+        THREAD LOCKED — 02 Dec 2006 — Admin<br>
+        <span style="color:var(--text-faint);">Thread cannot receive new replies.</span>
+      </div>
+
+      <div class="time-gap"><span>— months pass — — — years pass — —</span></div>
+
+      <!-- Graveyard of replies after locking — people still somehow posting -->
+      <div class="sys-notice warn">
+        NOTE — The following replies were posted AFTER the thread was locked.<br>
+        This should not be possible. Server logs show no record of these posts being created.<br>
+        They are present in the recovered archive. Their origin is unknown.
+      </div>
+
+      <!-- Ghost reply 1 -->
+      <div class="post corrupted">
+        <div class="post-header">
+          <span class="post-user ghost">searching_for_rizal</span>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <span class="post-timestamp corrupted">??? ??? ???? — ??:?? ??</span>
+          </div>
+        </div>
+        <div class="post-inner">
+          <div class="post-avatar">
+            <div class="avatar-icon ghost-av">??</div>
+            <div class="avatar-posts" style="color:#1a1a14;">Posts<br>1</div>
+          </div>
+          <div class="post-body">
+            <p>My name is Hana. I am his sister. I am posting this in several places. Has anyone on this forum had contact with my brother Rizal since October 2006. Please reply or email me privately. We are not able to find him. He was last seen in Perak. The police report is filed.</p>
+            <p>If you know anything about where he went please tell me.</p>
+          </div>
+        </div>
+        <div class="post-footer"><span>POST-LOCK — origin unknown</span><span class="report">—</span></div>
+      </div>
+
+      <!-- Ghost reply 2 — much later -->
+      <div class="post corrupted">
+        <div class="post-header">
+          <span class="post-user ghost">hana_aziz_1990</span>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <span class="post-timestamp corrupted">??? ??? ???? — ??:?? ??</span>
+          </div>
+        </div>
+        <div class="post-inner">
+          <div class="post-avatar">
+            <div class="avatar-icon ghost-av">HA</div>
+            <div class="avatar-posts" style="color:#1a1a14;">Posts<br>2</div>
+          </div>
+          <div class="post-body">
+            <p>Still no news. It's been a long time now. I am not going to write how long because I don't want to write it.</p>
+            <p>Someone told me about this thread. I came to read it. I read the whole thing.</p>
+            <p>The corner of the room he mentioned. I remember it. I remember why I wouldn't look at it directly. I remembered in the dream and then I knew it was real and then I pretended to myself for years it was a dream.</p>
+            <p>I don't know why I'm posting here. There's no one to post to. I just wanted someone to know that I believe him.</p>
+          </div>
+        </div>
+        <div class="post-footer"><span>POST-LOCK — origin unknown</span><span class="report">—</span></div>
+      </div>
+
+      <!-- Last ghost reply — unsigned, wrong timestamp -->
+      <div class="post corrupted">
+        <div class="post-header">
+          <span class="post-user ghost" style="color:#1a1510;">[unsigned]</span>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <span class="post-timestamp corrupted">00 ??? 0000 — 00:00 AM</span>
+          </div>
+        </div>
+        <div class="post-inner">
+          <div class="post-avatar">
+            <div class="avatar-icon ghost-av" style="border-color:#0d0d0a;">—</div>
+            <div class="avatar-posts" style="color:#0d0d0a;">—</div>
+          </div>
+          <div class="post-body" style="color:#2a2018;">
+            <p>He understood. That was the last thing he said. I understood because.</p>
+            <p>He understood and that was enough.</p>
+            <p>The corridor was the right length.</p>
+          </div>
+        </div>
+        <div class="post-footer" style="color:#0d0d0a;"><span>—</span><span>—</span></div>
+      </div>
+
+      <!-- Final admin notice -->
+      <div class="sys-notice red-box" style="margin-top:14px;">
+        ARCHIVENET RECOVERY LOG — THREAD: MUTIARA_SEP2006<br>
+        Recovery date: [unresolved]<br>
+        Thread status: Locked / Incomplete / Possibly corrupted<br>
+        Original poster account: ACTIVE — Last login: [unresolved]<br>
+        Thread flagged for permanent deletion: 14 Nov 2006<br>
+        Deletion completed: NO<br>
+        Deletion reason for failure: UNKNOWN<br>
+        <br>
+        This record is retained as-is. No further action has been taken.
+      </div>
+
+      <div style="text-align:center; padding:20px 0 10px;">
+        <a href="index.html" style="font-family:var(--mono); font-size:10px; color:var(--text-faint); text-decoration:none; border:1px solid var(--border); padding:4px 14px; letter-spacing:1px;">← return to archivenet</a>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main-layout -->
+
+  <div class="site-footer">
+    ArchiveNet — Preserving internet history since 2003<br>
+    This thread is part of the preserved archive. Some content may be incomplete or corrupted.
+  </div>
+
+</div><!-- /siteShell -->
+
+<script>
+// ══════════════════════════════════
+//   AUDIO ENGINE — Web Audio API
+// ══════════════════════════════════
+let audioCtx = null;
+let masterGain = null;
+
+function initAudio() {
+  if (audioCtx) return;
+  try {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    masterGain = audioCtx.createGain();
+    masterGain.gain.value = 0.04;
+    masterGain.connect(audioCtx.destination);
+    startAmbientHum();
+    scheduleCreaks();
+    scheduleStaticBurst();
+  } catch(e) {}
+}
+
+function startAmbientHum() {
+  if (!audioCtx) return;
+  // Low mains hum
+  const osc = audioCtx.createOscillator();
+  osc.type = 'sine';
+  osc.frequency.value = 57;
+  const g = audioCtx.createGain();
+  g.gain.value = 0.6;
+  osc.connect(g);
+  g.connect(masterGain);
+  osc.start();
+
+  // Faint high whine
+  const osc2 = audioCtx.createOscillator();
+  osc2.type = 'sine';
+  osc2.frequency.value = 220;
+  const g2 = audioCtx.createGain();
+  g2.gain.value = 0.06;
+  osc2.connect(g2);
+  g2.connect(masterGain);
+  osc2.start();
+
+  // Noise bed
+  const buf = audioCtx.createBuffer(1, audioCtx.sampleRate * 3, audioCtx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * 0.3;
+  const ns = audioCtx.createBufferSource();
+  ns.buffer = buf;
+  ns.loop = true;
+  const filt = audioCtx.createBiquadFilter();
+  filt.type = 'lowpass';
+  filt.frequency.value = 600;
+  const ng = audioCtx.createGain();
+  ng.gain.value = 0.18;
+  ns.connect(filt);
+  filt.connect(ng);
+  ng.connect(masterGain);
+  ns.start();
+}
+
+function playCreak() {
+  if (!audioCtx) return;
+  const now = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator();
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(80 + Math.random() * 40, now);
+  osc.frequency.exponentialRampToValueAtTime(40, now + 0.6);
+  const g = audioCtx.createGain();
+  g.gain.setValueAtTime(0.022, now);
+  g.gain.exponentialRampToValueAtTime(0.0001, now + 0.7);
+  osc.connect(g);
+  g.connect(audioCtx.destination);
+  osc.start(now);
+  osc.stop(now + 0.75);
+}
+
+function scheduleCreaks() {
+  const delay = 12000 + Math.random() * 25000;
+  setTimeout(() => {
+    playCreak();
+    scheduleCreaks();
+  }, delay);
+}
+
+function playStaticBurst() {
+  if (!audioCtx) return;
+  const now = audioCtx.currentTime;
+  const buf = audioCtx.createBuffer(1, Math.floor(audioCtx.sampleRate * 0.18), audioCtx.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1);
+  const src = audioCtx.createBufferSource();
+  src.buffer = buf;
+  const g = audioCtx.createGain();
+  g.gain.setValueAtTime(0.028, now);
+  g.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
+  src.connect(g);
+  g.connect(audioCtx.destination);
+  src.start(now);
+}
+
+function scheduleStaticBurst() {
+  const delay = 30000 + Math.random() * 60000;
+  setTimeout(() => {
+    playStaticBurst();
+    scheduleStaticBurst();
+  }, delay);
+}
+
+// ══════════════════════════════════
+//   INTRO SEQUENCE
+// ══════════════════════════════════
+const introLines = [
+  { id:'il0', text:'ArchiveNet / Announcements', delay:0 },
+  { id:'il1', text:' ', delay:600 },
+  { id:'il2', text:'WHO IS GAJEE?', delay:900, class:'big', hold:1800 },
+  { id:'il3', text:'WHAT IS GAJEE?', delay:2900, class:'red', hold:1600 },
+  { id:'il4', text:' ', delay:4700 },
+  { id:'il5', text:'do not search for GAJEE', delay:5100, hold:1400 },
+  { id:'il6', text:' ', delay:6700 },
+  { id:'il7', text:'he is not here anymore', delay:7100, class:'red', hold:2000 },
+  { id:'il8', text:' ', delay:9300 },
+];
+
+let introPhase = 0;
+
+function runIntro() {
+  introLines.forEach(line => {
+    setTimeout(() => {
+      const el = document.getElementById(line.id);
+      if (!el) return;
+      el.textContent = line.text;
+      el.className = 'intro-line ' + (line.class || '');
+      if (line.text !== ' ') el.classList.add('show');
+      if (line.hold) {
+        setTimeout(() => {
+          el.classList.add('fade');
+          el.classList.remove('show');
+        }, line.hold);
+      }
+    }, line.delay);
+  });
+
+  // After all lines, run loading screen
+  setTimeout(startLoadingScreen, 11200);
+}
+
+// ══════════════════════════════════
+//   LOADING SCREEN
+// ══════════════════════════════════
+const loadingSteps = [
+  { pct:8,  text:'Connecting to archive server...', sub:'' },
+  { pct:19, text:'Locating thread cache...', sub:'Thread ID: AN-ANNOUNCE-2006-09-21' },
+  { pct:31, text:'Checking integrity...', sub:'WARNING: partial data detected' },
+  { pct:44, text:'Recovering post content...', sub:'17 of 31 posts recoverable' },
+  { pct:55, text:'Retrieving image attachments...', sub:'IMG_001 — partial · IMG_002 — partial' },
+  { pct:67, text:'Reconstructing timestamps...', sub:'3 timestamps unresolvable' },
+  { pct:79, text:'Loading member data...', sub:'Original poster: account ACTIVE / status unknown' },
+  { pct:88, text:'Rendering thread...', sub:'Integrity: 61%' },
+  { pct:100, text:'Complete.', sub:'' },
+];
+
+function startLoadingScreen() {
+  // Fade out intro overlay
+  const intro = document.getElementById('introOverlay');
+  intro.style.transition = 'opacity 0.6s';
+  intro.style.opacity = '0';
+  setTimeout(() => { intro.style.display = 'none'; }, 650);
+
+  // Show loading screen
+  const ls = document.getElementById('loadingScreen');
+  ls.style.display = 'flex';
+
+  let step = 0;
+  const fill = document.getElementById('loadingBarFill');
+  const label = document.getElementById('loadingLabel');
+  const sub = document.getElementById('loadingSub');
+  const bytes = document.getElementById('loadingBytes');
+  let byteCount = 0;
+
+  const byteInterval = setInterval(() => {
+    byteCount += Math.floor(Math.random() * 800 + 200);
+    if (bytes) bytes.textContent = byteCount.toLocaleString() + ' bytes received';
+  }, 150);
+
+  function nextStep() {
+    if (step >= loadingSteps.length) {
+      clearInterval(byteInterval);
+      setTimeout(showSite, 400);
+      return;
+    }
+    const s = loadingSteps[step];
+    if (fill) fill.style.width = s.pct + '%';
+    if (label) label.textContent = s.text;
+    if (sub) sub.textContent = s.sub;
+    step++;
+    const wait = step === loadingSteps.length ? 600 : (300 + Math.random() * 400);
+    setTimeout(nextStep, wait);
+  }
+
+  nextStep();
+}
+
+function showSite() {
+  const ls = document.getElementById('loadingScreen');
+  ls.style.transition = 'opacity 0.5s';
+  ls.style.opacity = '0';
+  setTimeout(() => { ls.style.display = 'none'; }, 520);
+
+  const shell = document.getElementById('siteShell');
+  shell.style.display = 'block';
+  requestAnimationFrame(() => {
+    shell.style.opacity = '1';
+  });
+
+  startAmbientEffects();
+}
+
+// ══════════════════════════════════
+//   AMBIENT EFFECTS AFTER REVEAL
+// ══════════════════════════════════
+function startAmbientEffects() {
+  // Visitor counter
+  let vc = 4912;
+  setInterval(() => {
+    vc++;
+    const el = document.getElementById('visCount');
+    if (el) el.textContent = String(vc).padStart(6, '0');
+  }, 18000);
+
+  // Guest label changes
+  setTimeout(() => {
+    const g = document.getElementById('guestLabel');
+    if (g) g.textContent = 'reading post #25';
+  }, 25000);
+  setTimeout(() => {
+    const g = document.getElementById('guestLabel');
+    if (g) { g.textContent = 'left the thread'; g.style.color = 'var(--text-faint)'; }
+  }, 70000);
+  setTimeout(() => {
+    const g = document.getElementById('guestLabel');
+    if (g) { g.textContent = 'returned'; g.style.color = 'var(--red)'; }
+  }, 120000);
+
+  // Member count decrement after a while
+  setTimeout(() => {
+    const el = document.getElementById('memberCount');
+    if (el) el.textContent = '532';
+  }, 95000);
+
+  // Rare glitch flash
+  setInterval(() => {
+    if (Math.random() < 0.06) triggerGlitchFlash();
+  }, 75000);
+}
+
+function triggerGlitchFlash() {
+  const el = document.getElementById('glitchOverlay');
+  if (!el) return;
+  el.style.transition = 'none';
+  el.style.opacity = '0.9';
+  setTimeout(() => {
+    el.style.transition = 'opacity 0.25s';
+    el.style.opacity = '0';
+  }, 65);
+}
+
+// ══════════════════════════════════
+//   BOOT
+// ══════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  // First click / keypress starts audio
+  const startAudioOnce = () => {
+    initAudio();
+    document.removeEventListener('click', startAudioOnce);
+    document.removeEventListener('keydown', startAudioOnce);
+  };
+  document.addEventListener('click', startAudioOnce);
+  document.addEventListener('keydown', startAudioOnce);
+
+  runIntro();
+});
+</script>
+</body>
+</html>
